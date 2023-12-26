@@ -21,6 +21,4 @@ jobs:
 
       - run: poetry install --no-interaction --no-root
 
-      - run: poetry install --no-interaction
-
       - run: poetry run pytest
