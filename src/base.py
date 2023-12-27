@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -12,7 +14,7 @@ class Message(BaseModel):
 class Role(BaseModel):
     name: str
     description: str
-    actions: List[Any] = Field(default_factory=list)
+    actions: List[Action] = Field(default_factory=list)
 
 
 class Context(BaseModel):
@@ -34,7 +36,7 @@ class Action(ABC):
     def execute(
         self,
         role: Role,
-        to_do: List[Tuple[Role, "Action"]],
+        to_do: List[Tuple[Role, Action]],
         context: Context
     ) -> Optional[Message]:
         ...
