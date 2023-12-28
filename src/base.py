@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -7,7 +8,7 @@ from pydantic import BaseModel, Field
 
 
 class Message(BaseModel):
-    role: str
+    role: Optional[Role]
     content: str
 
 
@@ -43,3 +44,22 @@ class Action(ABC):
     
     def __repr__(self) -> str:
         return f"Action: {self.name}"
+
+
+class Team:
+    def __init__(
+        self,
+        roles: List[Role],
+        to_do: List[Tuple[Role, Action]]
+    ) -> None:
+        self.to_do = to_do
+        self.roles = roles
+        self.context = Context(session_id=uuid.uuid4(), roles=roles)
+    
+    def execute(self, command: str) -> Message:
+        while self.to_do:
+            role, action = self.to_do.pop()
+            message = action.execute(role=role, context=self.context)
+            if message:
+                return message
+        return Message(role=None, content="no further ado")
