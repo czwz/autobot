@@ -26,12 +26,18 @@ class Context(BaseModel):
 
 
 class Action(ABC):
-    name: str
-    command: str
-    description: str
-
     def __init__(self, command: str) -> None:
         self.command = command
+
+    @property
+    @abstractmethod
+    def description(self) -> str:
+        ...
+
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        ...
 
     @abstractmethod
     def execute(
