@@ -26,30 +26,25 @@ class Context(BaseModel):
 
 
 class Action(ABC):
-    def __init__(self, command: str) -> None:
-        self.command = command
-
-    @property
-    @abstractmethod
-    def description(self) -> str:
-        ...
-
-    @property
-    @abstractmethod
-    def name(self) -> str:
-        ...
+    @classmethod
+    def __init__subclass__(cls) -> None:
+        super().__init_subclass__()
+        if (
+            not isinstance(getattr(cls, "name"), str) or
+            not isinstance(getattr(cls, "description"), str)
+        ):
+            raise TypeError("name and description are required for an Action.")
 
     @abstractmethod
+    @classmethod
     def execute(
-        self,
+        cls,
+        command: str,
         role: Role,
         to_do: List[Tuple[Role, Action]],
         context: Context
     ) -> Optional[Message]:
         ...
-    
-    def __repr__(self) -> str:
-        return f"Action: {self.name}"
 
 
 class Team:
@@ -60,12 +55,20 @@ class Team:
     ) -> None:
         self.to_do = to_do
         self.roles = roles
-        self.context = Context(session_id=uuid.uuid4(), roles=roles)
-    
+        self.context = Context(
+            session_id=str(uuid.uuid4()),
+            roles=roles
+        )
+
     def execute(self, command: str) -> Message:
         while self.to_do:
             role, action = self.to_do.pop()
-            message = action.execute(role=role, context=self.context)
+            message = action.execute(
+                command=command,
+                role=role,
+                to_do=self.to_do,
+                context=self.context
+            )
             if message:
                 return message
         return Message(role=None, content="no further ado")
