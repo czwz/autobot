@@ -44,7 +44,7 @@ class Action(ABC):
         to_do: List[Tuple[Role, Action]],
         context: Context
     ) -> Optional[Message]:
-        ...
+        raise NotImplementedError("Defined `execute` method when subclassing")
 
 
 class Team:
