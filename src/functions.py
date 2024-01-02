@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Type
 
 from .base import Action, Context, Message, Role
 from .roles import User
@@ -9,7 +9,29 @@ logger = Logger(name="autobot")
 
 
 class Think(Action):
-    ...
+    name: str = "think about what to do next"
+    description: str = (
+        "this action decides what will be the"
+        "next action in order to acheive the"
+        "user command."
+    )
+
+    @classmethod
+    def execute(
+        cls,
+        command: str,
+        role: Role,
+        to_do: List[Tuple[Role, Type[Action]]],
+        context: Context
+    ) -> Optional[Message]:
+        if role.name == "Master":
+            chosen_role = next(r for r in context.roles if r != role)
+            chosen_action = chosen_role.actions[0]
+        else:
+            chosen_role = role
+            chosen_action = chosen_role.actions[1]
+
+        to_do.append((chosen_role, chosen_action))
 
 
 class GetReply(Action):
@@ -29,7 +51,7 @@ class ProcessUserInput(Action):
         cls,
         command: str,
         role: Role,
-        to_do: List[Tuple[Role, Action]],
+        to_do: List[Tuple[Role, Type[Action]]],
         context: Context
     ) -> Optional[Message]:
         """the definition on how to process the input"""
@@ -40,4 +62,4 @@ class ProcessUserInput(Action):
             context.history.append(message)
         else:
             logger.info("the input is a command, let's think how to do it ...")
-            to_do.append((role, Think(command=command)))
+            to_do.append((role, Think))
