@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Type
 
 from pydantic import BaseModel, Field
 
@@ -15,7 +15,7 @@ class Message(BaseModel):
 class Role(BaseModel):
     name: str
     description: str
-    actions: List[Action] = Field(default_factory=list)
+    actions: List[Type[Action]] = Field(default_factory=list)
 
 
 class Context(BaseModel):
@@ -41,7 +41,7 @@ class Action(ABC):
         cls,
         command: str,
         role: Role,
-        to_do: List[Tuple[Role, Action]],
+        to_do: List[Tuple[Role, Type[Action]]],
         context: Context
     ) -> Optional[Message]:
         raise NotImplementedError("Defined `execute` method when subclassing")
@@ -51,7 +51,7 @@ class Team:
     def __init__(
         self,
         roles: List[Role],
-        to_do: List[Tuple[Role, Action]]
+        to_do: List[Tuple[Role, Type[Action]]]
     ) -> None:
         self.to_do = to_do
         self.roles = roles
