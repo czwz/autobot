@@ -22,7 +22,7 @@ class Think(Action):
         command: str,
         role: Role,
         to_do: List[Tuple[Role, Type[Action]]],
-        context: Context
+        context: Context,
     ) -> Optional[Message]:
         if role.name == "Master":
             chosen_role = next(r for r in context.roles if r != role)
@@ -52,7 +52,7 @@ class ProcessUserInput(Action):
         command: str,
         role: Role,
         to_do: List[Tuple[Role, Type[Action]]],
-        context: Context
+        context: Context,
     ) -> Optional[Message]:
         """the definition on how to process the input"""
         logger.info("Get the input from the user, start processing ...")

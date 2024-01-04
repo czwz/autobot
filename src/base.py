@@ -29,10 +29,9 @@ class Action(ABC):
     @classmethod
     def __init__subclass__(cls) -> None:
         super().__init_subclass__()
-        if (
-            not isinstance(getattr(cls, "name"), str) or
-            not isinstance(getattr(cls, "description"), str)
-        ):
+        name = getattr(cls, "name")
+        description = getattr(cls, "description")
+        if not isinstance(name, str) or not isinstance(description, str):
             raise TypeError("name and description are required for an Action.")
 
     @abstractmethod
@@ -42,32 +41,24 @@ class Action(ABC):
         command: str,
         role: Role,
         to_do: List[Tuple[Role, Type[Action]]],
-        context: Context
+        context: Context,
     ) -> Optional[Message]:
         raise NotImplementedError("Defined `execute` method when subclassing")
 
 
 class Team:
     def __init__(
-        self,
-        roles: List[Role],
-        to_do: List[Tuple[Role, Type[Action]]]
+        self, roles: List[Role], to_do: List[Tuple[Role, Type[Action]]]
     ) -> None:
         self.to_do = to_do
         self.roles = roles
-        self.context = Context(
-            session_id=str(uuid.uuid4()),
-            roles=roles
-        )
+        self.context = Context(session_id=str(uuid.uuid4()), roles=roles)
 
     def execute(self, command: str) -> Message:
         while self.to_do:
             role, action = self.to_do.pop()
             message = action.execute(
-                command=command,
-                role=role,
-                to_do=self.to_do,
-                context=self.context
+                command=command, role=role, to_do=self.to_do, context=self.context
             )
             if message:
                 return message
