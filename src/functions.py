@@ -32,6 +32,7 @@ class Think(Action):
             chosen_action = chosen_role.actions[1]
 
         to_do.append((chosen_role, chosen_action))
+        return None
 
 
 class GetReply(Action):
@@ -56,7 +57,7 @@ class GetReply(Action):
                 reply = context.history[-1].content
                 context.lookup[key] = reply
             break
-        return
+        return None
 
 
 class Ask(Action):
@@ -102,3 +103,19 @@ class ProcessUserInput(Action):
         else:
             logger.info("the input is a command, let's think how to do it ...")
             to_do.append((role, Think))
+        return None
+
+
+class DoSomethin(Action):
+    name: str = "demo on doing something"
+    description: str = ""
+
+    @classmethod
+    def execute(
+        cls,
+        command: str,
+        role: Role,
+        to_do: List[Tuple[Role, Type[Action]]],
+        context: Context,
+    ) -> Optional[Message]:
+        ...
