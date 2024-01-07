@@ -106,7 +106,7 @@ class ProcessUserInput(Action):
         return None
 
 
-class DoSomethin(Action):
+class DoSomething(Action):
     name: str = "demo on doing something"
     description: str = ""
 
