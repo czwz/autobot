@@ -1,8 +1,8 @@
 from logging import Logger
 from typing import List, Optional, Tuple, Type
 
-from .base import Action, Context, Message, Role
-from .roles import User
+from src.base import Action, Context, Message, Role
+from src.roles import User
 
 
 logger = Logger(name="autobot")
@@ -35,7 +35,28 @@ class Think(Action):
 
 
 class GetReply(Action):
-    ...
+    name: str = "get user's input as reply."
+    description: str = (
+        "this action will treat last message in history"
+        "as the reply for key opened by the last action."
+    )
+
+    @classmethod
+    def execute(
+        cls,
+        command: str,
+        role: Role,
+        to_do: List[Tuple[Role, Type[Action]]],
+        context: Context,
+    ) -> Optional[Message]:
+        for key, val in context.lookup.items():
+            if val is not None:
+                continue
+            else:
+                reply = context.history[-1].content
+                context.lookup[key] = reply
+            break
+        return
 
 
 class ProcessUserInput(Action):
