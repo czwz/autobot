@@ -59,6 +59,24 @@ class GetReply(Action):
         return
 
 
+class Ask(Action):
+    name: str = "ask somethong to user"
+    description: str = "this action will ask user when anything is unclear"
+
+    @classmethod
+    def execute(
+        cls,
+        command: str,
+        role: Role,
+        to_do: List[Tuple[Role, Type[Action]]],
+        context: Context,
+    ) -> Optional[Message]:
+        to_do.append((role, GetReply))
+        return Message(
+            role=role, content=f"Please provide missing information: {command}"
+        )
+
+
 class ProcessUserInput(Action):
     name: str = "process the input from user."
     description: str = (
